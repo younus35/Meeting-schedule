@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () =>{
-    //SLOTS DATABASE axios get
+    displayTimeSlots();
 })
 
 const timeSlots = document.querySelector('.slots');
@@ -8,14 +8,23 @@ const confirmMessageContainer = document.querySelector('.confirmation-message');
 const bookedMeetings = document.querySelector('.meetings');
 
 function displayTimeSlots() {
+ axios.get('http://localhost:3000/get-slots')
+  .then(res => {
     timeSlots.innerHTML = '';
-    //available slots for loop
-    timeSlots.appendChild()//child name
+    res.data.forEach(slot => {
+        const li = document.createElement('li');
+        li.textContent = `${slot.time} - Available Slots: ${slot.slotsAvailable}`;
+        li.addEventListener('click', () => showBookingForm(slot.id));
+        timeSlots.appendChild(li);
+    });  
+  })
+  .catch(err => console.log(err));
 }
 
-function showBookignForm(time){
+function showBookingForm(slotId){
     bookingFormContainer.innerHTML = `
     <form id="bookingForm">
+        <input type="hidden" id="slotId" name="slotId" value="${slotId}">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br>
         <label for="email">Email:</label>
@@ -28,17 +37,19 @@ function showBookignForm(time){
     event.preventDefault();
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
-    const details = {
-        name:name,
-        email:email
-    }
-    //axios post
-    bookMeeting(time,name,email);
+    // const details = {
+    //     name:name,
+    //     email:email
+    // }
+    bookMeeting(slotId,name,email);
  })
 }
 
-function bookMeeting(time,name,email){
-   //const slot  get slot form db and check slot.time === time
+function bookMeeting(slotId,name,email){
+ axios.patch(`http://localhost:3000/book-slot/${slotId}`, { name, email })
+   .then(res =>{
+
+   })
    if(slot.slots > 0){
       //decrease the slot 
       displayTimeSlots();
